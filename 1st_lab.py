@@ -133,9 +133,24 @@ ECG = [
     0.016949, 0.013559, 0.010169, 0.0067797, 0.0033898, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+x = np.arange(-np.pi, np.pi, 2*np.pi/320)
+
+# Input_1kHz_15kHz_1 = [Input_1kHz_15kHz[0:160]] + [Input_1kHz_15kHz[161:]]
+
+def swap_two_halves(signal):
+    first_half = signal[:int(len(signal) / 2)]
+    second_half = signal[int(len(signal) / 2 + 1):]
+    new_signal = []
+    for element in second_half:
+        new_signal.append(element)
+    for element in first_half:
+        new_signal.append(element)
+    final_signal = np.array(new_signal)
+    return final_signal
+
 def plot(array, title):
     plt.title(title)
-    plt.plot(array)
+    plt.plot(x, array)
     plt.show()
 
 def plot_dis(array, title):
@@ -145,14 +160,18 @@ def plot_dis(array, title):
 
 plt.clf()
 
-# plot(Input_1kHz_15kHz, "Input Signal")
+print(len(x))
+Input_1kHz_15kHz_1 = swap_two_halves(Input_1kHz_15kHz)
+
+plot(Input_1kHz_15kHz, "Input Signal")
+plot_dis(Input_1kHz_15kHz, "Input Signal D")
 #plot(Impulse_response)
 
 # Number of samples in normalized_tone
 # without abs we only get the real part
 y = fft(Input_1kHz_15kHz)
-plot(y, "Real")
-
+plot(y.real, "Real")
+# y_1 = fft(Input_1kHz_15kHz_1)
 
 #there are 1 low freg but high mag and 1 high freq but low mag
 # abs shows the magnitude
@@ -167,7 +186,7 @@ plot(img, "Imaginary")
 #Inverse-FFT
 inv = ifft(y)
 #print(inv)
-plot(abs(inv), "Inverse fft")
+plot(inv.real, "Inverse fft")
 
 #phase plot
 phase = []
@@ -176,18 +195,18 @@ for c in y:
 plot(phase, "Phase")
 
 #impulse response
-plot_dis(Impulse_response, "Impulse response") #discrete => continuous, next use fft to get the requirement
-fft_impulse = fft(Impulse_response)
-plot(fft_impulse, "Fourier Transform of Impulse Response")
-plot(abs(fft_impulse), "Mag of Ft im")
-img_i = []
-for c in fft_impulse:
-    img_i.append(c.imag)
-plot(img_i, "Imaginary Im")
-phase_i = []
-for c in fft_impulse:
-    phase_i.append(cmath.phase(c))
-plot(phase_i, "Phase Im")
+# plot_dis(Impulse_response, "Impulse response") #discrete => continuous, next use fft to get the requirement
+# fft_impulse = fft(Impulse_response)
+# plot(fft_impulse, "Fourier Transform of Impulse Response")
+# plot(abs(fft_impulse), "Mag of Ft im")
+# img_i = []
+# for c in fft_impulse:
+#     img_i.append(c.imag)
+# plot(img_i, "Imaginary Im")
+# phase_i = []
+# for c in fft_impulse:
+#     phase_i.append(cmath.phase(c))
+# plot(phase_i, "Phase Im")
 
 
 convo = np.convolve(Input_1kHz_15kHz, Impulse_response, mode="same")
@@ -197,14 +216,18 @@ convo = np.convolve(Input_1kHz_15kHz, Impulse_response, mode="same")
 #multi and then convert = convert and then multi (prove)
 
 fourier = fft(convo)
-plot(abs(fourier), "Fourier Transform of the convolution")
+# plot(abs(fourier), "Fourier Transform of the convolution")
 
 # plt.title("Fourier Transform of the convolution 1")
-# plt.plot(fourier, mode="same")
+# plt.plot(fourier)
 # plt.show()
 
 Pad_impulse_response = (Impulse_response + 320*[0])[:320]
 #print(Pad_impulse_response)
-ft_pad = fft(Pad_impulse_response)
-freq_mul = np.multiply(y, ft_pad)
-plot(abs(freq_mul), "Frequency multiplication")
+# ft_pad = fft(Pad_impulse_response)
+# freq_mul = np.multiply(y, ft_pad)
+# plot(abs(freq_mul), "Frequency multiplication")
+
+
+
+
